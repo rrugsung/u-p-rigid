@@ -13,6 +13,8 @@ Stress and Strain are computed by using the B matrix computed at particle level 
 
 Damping is included, but needs improvements
 
-Undrained boundary can be applied by making only the velicity in the direction of the ourward normal to the boundary to zero.
+Undrained boundary can be applied by making only the velocity in the direction of the ourward normal to the boundary to zero.
 
 Lumped mass matrix is used in the formulation
+
+Contact algorithm between rigid and two-phase material was implemented 
