@@ -90,11 +90,10 @@ void mpm::Element::find_free_surface_nodes() {
   auto nptr = this->give_element_node_ptr_at(nid);
   Eigen::Matrix<double,1,dim> ncoord = nptr->give_node_coordinates();
   //if(ncoord(0) > 0.5) {
-    for (const auto &neighbour_ptr : neighbour_elements_) {
-      if ((neighbour_ptr->give_ratio_particle_volume_to_element_volume()) < alpha) {
-	free_ = 1;
-	this->insert_to_free_surface_nodes(neighbour_ptr);
-
+  for (const auto &neighbour_ptr : neighbour_elements_) {
+    if ((neighbour_ptr->give_ratio_particle_volume_to_element_volume()) < alpha) {
+	    free_ = 1;
+	    this->insert_to_free_surface_nodes(neighbour_ptr);
       }
     }
     //}

@@ -75,6 +75,8 @@ public:
     return num_nodes_;
   }
 
+  
+
   void print_nnodes();
 
 private:

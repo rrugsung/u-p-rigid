@@ -11,7 +11,7 @@ L_FLAGS = -g
 
 # library paths and names
 LIB_DIR = $(WORK_DIR)/libs
-BOOST = $(LIB_DIR)/boost_1_55_0
+BOOST = $(LIB_DIR)/boost_1_73_0
 EIGEN = /usr/local/include/eigen3
 
 # include directory for mpm header files

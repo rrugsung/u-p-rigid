@@ -6,6 +6,7 @@ mpm::Node::Node(std::string& input_line, const unsigned& id) {
   input >> third;
 
   nphase_ = 1;
+  penalty_factor_ = 0;
 
   nsolid_mass_     = 0.;
   nwater_mass_     = 0.;
@@ -172,7 +173,7 @@ void mpm::Node::compute_nodal_initial_velocity(bool contact) {
 }
 
 void mpm::Node::matrix_test() {
-  if (material_ids_.size() > 1) {
+  if (nid_ == 399 || nid_ == 400 || nid_ == 420 || nid_ == 421) {
     std::cout << "node_id: " << nid_ << " \n";
     std::cout << "nsolid_masses_: \n" << nsolid_masses_ << " \n";
     std::cout << "nsolid_mass_: \n" << nsolid_mass_ << " \n";
@@ -181,6 +182,8 @@ void mpm::Node::matrix_test() {
     std::cout << "nintrmd_masses_: \n" << nintrmd_masses_ << "\n";
     std::cout << "mixture_masses_: \n" << nmixture_masses_ << " \n";
     std::cout << "mixture_mass_: \n" << nmixture_mass_ << " \n\n";
+    std::cout << "nsolid_momentum: \n" << nsolid_momentum_ << "\n";
+    std::cout << "nsolid_momenta: \n" << nsolid_momenta_ << "\n";
     std::cout << "nmixture_body_forces_: \n" << nmixture_body_forces_ << " \n";
     std::cout << "nmixture_body_force_: \n" << nmixture_body_force_ << " \n";
     std::cout << "nwater_body_forces_: \n" << nwater_body_forces_ << " \n";
@@ -188,20 +191,19 @@ void mpm::Node::matrix_test() {
     std::cout << "nmixture_int_forces_: \n" << nmixture_int_forces_ << " \n";
     std::cout << "nmixture_int_force_: \n" << nmixture_int_force_ << " \n";
     std::cout << "nwater_int_forces_: \n" << nwater_int_forces_ << " \n";
-    std::cout << "nwater_int_force_: \n" << nwater_int_force_ << " \n";
-    std::cout << "KS2_force: \n" << KS2_force_ << " \n";
-    std::cout << "KS2_forces: \n" << KS2_forces_ << " \n\n";
+    std::cout << "nwater_int_force_: \n" << nwater_int_force_ << " \n\n";
     std::cout << "nsolid_initial_velocities_: \n" << nsolid_initial_velocities_ << " \n";
     std::cout << "nsolid_intitial_velocity_: \n" << nsolid_initial_velocity_ << " \n";  
     std::cout << "nsolid_int_accelerations_: \n" << nsolid_int_accelerations_ << " \n";
     std::cout << "nsolid_int_acceleration_: \n" << nsolid_int_acceleration_ << " \n";  
     std::cout << "nsolid_int_velocities_: \n" << nsolid_int_velocities_ << " \n";
     std::cout << "nsolid_int_velocity_: \n" << nsolid_int_velocity_ << " \n";    
-    //std::cout << "nwater_int_velocities_: \n" << nwater_int_velocities_ << " \n";
-    //std::cout << "nwater_int_velocity_: \n" << nwater_int_velocity_ << " \n";
+    std::cout << "nwater_int_velocities_: \n" << nwater_int_velocities_ << " \n";
+    std::cout << "nwater_int_velocity_: \n" << nwater_int_velocity_ << " \n";
     std::cout << "nsolid_final_accelerations_: \n" << nsolid_final_accelerations_ << " \n";
     std::cout << "nsolid_final_acceleration_: \n" << nsolid_final_acceleration_ << " \n"; 
     std::cout << "unit_normal_vector: \n" << normal_unit_vectors_ <<"\n";
+    std::cout << "penalty_factor: \n" << penalty_factor_ << "\n";
     std::cout << "nsolid_final_velocities_: \n" << nsolid_final_velocities_ << " \n";
     std::cout << "nsolid_final_velocity_: \n" << nsolid_final_velocity_ << " \n\n"; 
     std::cout << "relative_velocities: \n" << nsolid_relative_velocities_ << "\n\n";
@@ -239,7 +241,7 @@ void mpm::Node::compute_intermediate_solid_acceleration(const unsigned index, co
       double velocity_normal = relative_velocity.dot(normal_unit_vectors_.row(0));
       if (std::fabs(velocity_normal) < 1E-15)
         velocity_normal = 0;
-      Eigen::Matrix<double,1,dim> normal_correction = velocity_normal*normal_unit_vectors_.row(0);
+      Eigen::Matrix<double,1,dim> normal_correction = velocity_normal*normal_unit_vectors_.row(0)*penalty_factor_;
       nsolid_int_velocity_ = nsolid_int_velocity_ + normal_correction;
     }
 
@@ -382,6 +384,8 @@ void mpm::Node::compute_intermediate_water_velocity(const unsigned index) {
     if (std::fabs(nwater_masses_(mat_id)) > 1.E-18) {
       nwater_int_velocities_.row(mat_id) = (nwater_body_forces_.row(mat_id)+nwater_int_forces_.row(mat_id)+nwater_trac_forces_.row(mat_id) 
       - nintrmd_masses_.row(mat_id) * nsolid_int_accelerations_.row(mat_id)) / nwater_masses_(mat_id);
+      if(material_ids_.size() == 2)
+        nwater_int_velocities_(mat_id,1) = 0.;
       if(nwater_constraints_.size()) {
         for (unsigned i = 0; i < nwater_constraints_.size(); i++) {
           unsigned direction = std::get<0>(nwater_constraints_.at(i));
@@ -420,13 +424,15 @@ void mpm::Node::compute_multimaterial_normal_unit_vectors() {
       normal_unit_vector = largest_domain_gradient.normalized();
     if (mat_id_largest != i)
       normal_unit_vector = -1 * normal_unit_vector;
-    if (i == 0) {
-      normal_unit_vector(0) = 0;
-      normal_unit_vector(1) = 1;
-    }
-    else if (i == 1) {
-      normal_unit_vector(0) = 0;
-      normal_unit_vector(1) = -1;
+    if (nid_ == 378 || nid_ == 399 || nid_ == 420) {
+      if (i == 0) {
+        normal_unit_vector(0) = 0;
+        normal_unit_vector(1) = 1;
+      }
+      else if (i == 1) {
+        normal_unit_vector(0) = 0;
+        normal_unit_vector(1) = -1;
+      }
     }
     normal_unit_vectors_.row(i) = normal_unit_vector;
   }
@@ -455,10 +461,10 @@ void mpm::Node::apply_contact_mechanics(const double& dt){
         //tangent_correction(0) = normal_unit_vector(1) * cross_product;
         //tangent_correction(1) = -normal_unit_vector(0) * cross_product;
         //tangent_correction = -mu * velocity_normal / std::abs(cross_product) *
-                               tangent_correction;
+        //                       tangent_correction;
 
       // Update the velocity with the computed corrections
-        corrections = normal_correction + tangent_correction;
+        corrections = (normal_correction + tangent_correction)*penalty_factor_;
         corrected_velocity = corrected_velocity + corrections;
 
         for (auto j=0; j<dim; j++){

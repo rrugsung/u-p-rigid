@@ -153,12 +153,13 @@ int main (int argc, char* argv[]) {
     // COMPUTE MULTIMATERIAL UNIT NORMAL VECTOR
     particles->iterate_over_particles(std::bind(&mpm::Particle::map_multimaterial_domain_gradients, std::placeholders::_1));
     mesh -> iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_multimaterial_normal_unit_vectors, std::placeholders::_1));
-
+    particles->iterate_over_sp_particles(std::bind(&mpm::Particle::compute_penalty_factor, std::placeholders::_1));
     // mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_nodal_damping_forces, std::placeholders::_1,damping_factor));
+
     
-    // COMPUTE INTERMEDIATE RIGID BODY ACCELERATION
     mesh->compute_rigid_body_int_acceleration();
     
+    // COMPUTE INTERMEDIATE RIGID BODY ACCELERATION
     // BUILD MATRICES FOR THE CG SEMI-IMPLICIT SOLVER
     particles->iterate_over_tp_particles(std::bind(&mpm::Particle::compute_element_matrix_mp, std::placeholders::_1, dt));
     solver->assemble_solver(mesh);
@@ -181,8 +182,8 @@ int main (int argc, char* argv[]) {
 
     // APPLY CONTACT MECHANICS
     mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_multimaterial_relative_velocities, std::placeholders::_1));
-    //mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::matrix_test, std::placeholders::_1));
     mesh -> iterate_over_nodes_of_p(std::bind(&mpm::Node::apply_contact_mechanics, std::placeholders::_1, dt));
+    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::matrix_test, std::placeholders::_1));
 
     //! UPDATE PARTICLES
     if (Contact)
@@ -194,9 +195,9 @@ int main (int argc, char* argv[]) {
     particles->iterate_over_particles(std::bind(&mpm::Particle::update_porosity, std::placeholders::_1, dt));
 
     //! COMPUTE STRAIN AND STRESSES
-    // particles->iterate_over_particles(std::bind(&mpm::Particle::compute_solid_strain_rate, std::placeholders::_1));
-    // particles->iterate_over_particles(std::bind(&mpm::Particle::compute_solid_strain, std::placeholders::_1,dt));
-    // particles->iterate_over_particles(std::bind(&mpm::Particle::compute_solid_stress, std::placeholders::_1,dt));
+    //particles->iterate_over_particles(std::bind(&mpm::Particle::compute_solid_strain_rate, std::placeholders::_1, Contact));
+    //particles->iterate_over_particles(std::bind(&mpm::Particle::compute_solid_strain, std::placeholders::_1,dt));
+    //particles->iterate_over_tp_particles(std::bind(&mpm::Particle::compute_solid_stress, std::placeholders::_1,dt));
 
     //! PRESSURE SMOOTHENING - DEACTIVATE IF NOT NECESSARY
     if (TwoPhase){

@@ -141,6 +141,8 @@ public:
 
 //#####################################
   void map_multimaterial_domain_gradients();
+
+  void compute_penalty_factor();
 //#####################################
 
   // compute strain rate

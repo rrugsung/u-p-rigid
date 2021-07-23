@@ -89,6 +89,10 @@ public:
     nphase_ = nodal_phase;
   }
   
+  void assign_node_penalty_factor(double factor){
+    penalty_factor_ = factor;
+  }
+
   //! Add material id from material points to list of materials in materials_
   //! \param[in] id Material id to be stored at the node
   void append_material_id(unsigned id) {
@@ -285,6 +289,12 @@ public:
   //! param[out] ncoord_ coordinates of the node
   Eigen::Matrix<double,1,dim> give_node_coordinates() const {
       return ncoord_;
+  }
+
+  // give penalty_factor
+  //! param[out] penalty_factor_
+  double give_node_penalty_factor() const {
+    return penalty_factor_;
   }
 
   // give nodal solid mass
@@ -562,6 +572,9 @@ protected:
 
   // Number of phase
   unsigned nphase_ = 1;
+
+  // penalty factor for contact
+  double penalty_factor_;
 
   // nodal lumped mass
   double nsolid_mass_;

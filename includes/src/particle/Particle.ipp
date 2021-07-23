@@ -7,7 +7,7 @@ mpm::Particle::Particle(const unsigned& id, const unsigned& material_id, const E
   spacing_(0) = spacing_(1)=sqrt(volume_);
   gravity_ = Eigen::Matrix<double, 1, dim>::Zero();
   if (mpm::misc::gravity)
-    gravity_(dim -1) = -10;
+    gravity_(dim -1) = -9.81;
 
   solid_traction_.clear();
   water_traction_.clear();
@@ -123,6 +123,31 @@ void mpm::Particle::map_multimaterial_domain_gradients(){
     Eigen::Matrix<double, 1, dim> gradient;
     gradient = volume_ * grad_shape_fun_.col(i);
     nodes_(i)->assign_multimaterial_domain_gradients(mat_id_, gradient);
+  }
+}
+
+void mpm::Particle::compute_penalty_factor() {
+  for (unsigned i=0; i< numNodes; i++) {
+    double temp_factor;
+    double factor = nodes_(i)->give_node_penalty_factor();
+    Eigen::Matrix<double,1,dim> d = element_->give_element_length();
+    std::set<unsigned> material_ids = nodes_(i)->material_ids_;
+    if (material_ids.size() == 2) {
+      Eigen::Matrix<double,1,dim> ncoord = nodes_(i)->give_node_coordinates();
+      double s1 = ncoord(0) - coord_(0);
+      double s2 = ncoord(1) - coord_(1);
+      double s = sqrt(pow(s1,2) + pow(s2,2))-0.03536;
+      if (s < 0)
+        s = 0;
+      //temp_factor = 1 - pow((s/d(0)),3);
+      temp_factor = pow((d(0)-s)/d(0),3);
+      if(temp_factor < 0) {
+        temp_factor = 0;
+      }
+      if(temp_factor > factor){
+        nodes_(i)->assign_node_penalty_factor(temp_factor);
+      }
+    } 
   }
 }
 
@@ -417,11 +442,14 @@ void mpm::Particle::update_density_and_mass(const double &compressibility) {
 
 void mpm::Particle::update_porosity(const double &dt) {
   double dvol_strain = dt * (solid_centre_strain_rate_(0) + solid_centre_strain_rate_(1));
+  //volume_ = porosity_*volume_ + (1-porosity_)*volume_* (1 + dvol_strain);
+  //if (nphase_ == 2) {
+  //  porosity_ = porosity_/(1 + (1 - porosity_) * (1 + dvol_strain));
+  //}
+  porosity_ = 1 - ((1 - porosity_) / (1 + dvol_strain));
+
   volume_ = volume_ * (1 + dvol_strain);
-  if (nphase_ == 2) {
-    porosity_ = 1 - ((1 - porosity_) / (1 + dvol_strain));
-    water_mass_ = porosity_ * water_grain_density_ * volume_;
-  }
+  water_mass_ = porosity_ * water_grain_density_ * volume_;
 }
 
 

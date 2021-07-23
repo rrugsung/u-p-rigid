@@ -62,7 +62,7 @@ bool mpm::ProjectionSolver::solve_pressure_poisson_equation(const double& dt) {
     Eigen::Matrix<double,1,dim> nsolid_int_velocity = nptr->give_node_solid_intermediate_velocity();
     intermediate_solid_velocity_(node) = nsolid_int_velocity(0);
     intermediate_solid_velocity_(node+num_nodes_) = nsolid_int_velocity(1);
-    Eigen::Matrix<double,1,dim> nwater_int_velocity = nptr->give_node_water_intermediate_velocity();
+    Eigen::Matrix<double,1,dim> nwater_int_velocity = nptr->give_node_multimaterial_water_intermediate_velocities(0);
     intermediate_water_velocity_(node) = nwater_int_velocity(0);
     intermediate_water_velocity_(node+num_nodes_) = nwater_int_velocity(1);
     node++;
@@ -72,9 +72,15 @@ bool mpm::ProjectionSolver::solve_pressure_poisson_equation(const double& dt) {
   this->apply_pressure_boundary_conditions_to_system();
   if (!Conjugate_Gradient(pressure_))
     std::cerr << "Failed solving Poisson equation using CG" << "\n";
-  //std::cout << "force_vector: \n" << force_vector_ << "\n";
+  std::cout << "force_vector (399): \n" << force_vector_(399) << "\n";
+  std::cout << "force_vector (400): \n" << force_vector_(400) << "\n";
+  std::cout << "force_vector (420): \n" << force_vector_(420) << "\n";
+  std::cout << "force_vector (421): \n" << force_vector_(421) << "\n";
   //std::cout << "L_: \n" << stiffness_matrix_ << "\n";
-  //std::cout << "pressure_: \n" << pressure_ <<  "\n\n";
+  std::cout << "pressure_ (399): \n" << pressure_(399) <<  "\n";
+  std::cout << "pressure_ (400): \n" << pressure_(400) <<  "\n";
+  std::cout << "pressure_ (420): \n" << pressure_(420) <<  "\n";
+  std::cout << "pressure_ (421): \n" << pressure_(421) <<  "\n";
   //for (unsigned i = 0; i < pressure_.size(); i++) {
   //   if (std::fabs(pressure_(i)) < 1.0E2)
   //     pressure_(i) = 0.;
