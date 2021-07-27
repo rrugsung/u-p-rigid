@@ -294,7 +294,7 @@ void mpm::Node::compute_final_solid_acceleration(const unsigned index, const dou
       double velocity_normal = relative_velocity.dot(normal_unit_vectors_.row(0));
       if (std::fabs(velocity_normal) < 1E-15)
         velocity_normal = 0;
-      Eigen::Matrix<double,1,dim> normal_correction = velocity_normal*normal_unit_vectors_.row(0);
+      Eigen::Matrix<double,1,dim> normal_correction = velocity_normal*normal_unit_vectors_.row(0)*penalty_factor_;
       nsolid_final_velocity_ = nsolid_final_velocity_ + normal_correction;
     //nsolid_final_velocity_ = nsolid_int_velocity_ + (dt * (nsolid_final_acceleration_ - nsolid_int_acceleration_));
   }
@@ -441,7 +441,8 @@ void mpm::Node::compute_multimaterial_normal_unit_vectors() {
 void mpm::Node::apply_contact_mechanics(const double& dt){
   if (material_ids_.size() > 1) {
     double tolerance = 1.E-12;
-    for (auto i=0; i<numMats; i++){
+    //for (auto i=0; i<numMats; i++){
+      unsigned i = 0;
       Eigen::Matrix<double,1,dim> normal_unit_vector = normal_unit_vectors_.row(i);
       Eigen::Matrix<double,1,dim> relative_velocity = nsolid_relative_velocities_.row(i);
       double velocity_normal = relative_velocity.dot(normal_unit_vector);
@@ -464,7 +465,7 @@ void mpm::Node::apply_contact_mechanics(const double& dt){
         //                       tangent_correction;
 
       // Update the velocity with the computed corrections
-        corrections = (normal_correction + tangent_correction)*penalty_factor_;
+        corrections = (normal_correction + tangent_correction);
         corrected_velocity = corrected_velocity + corrections;
 
         for (auto j=0; j<dim; j++){
@@ -475,7 +476,7 @@ void mpm::Node::apply_contact_mechanics(const double& dt){
         Eigen::Matrix<double,1,dim> corrected_acc = corrections / dt;
         nsolid_final_accelerations_.row(i) = nsolid_final_accelerations_.row(i) + corrected_acc;
       }
-    }
+    //}
   }
 }
 
