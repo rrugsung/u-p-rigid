@@ -368,7 +368,7 @@ void mpm::Particle::compute_solid_stress(const double dt) {
   material_->compute_stress(solid_dstrain, solid_stress_, plastic_strain_);
 }
 
-void mpm::Particle::update_contact_velocity_and_position(const double& dt, const double& time) {
+void mpm::Particle::update_contact_velocity_and_position(const double& dt) {
   Eigen::Matrix<double,1,dim> temp_solid_final_acceleration = Eigen::Matrix<double,1,dim>::Zero();
   Eigen::Matrix<double,1,dim> temp_solid_final_velocity = Eigen::Matrix<double,1,dim>::Zero();
   Eigen::Matrix<double,1,dim> temp_solid_inc_velocity = Eigen::Matrix<double,1,dim>::Zero();

@@ -274,6 +274,9 @@ public:
   //apply contact mechanics
   void apply_contact_mechanics(const double& dt);
 
+  //moving mesh
+  void update_mesh_configuration(double rigid_displacement, double soil_depth);
+
   // give id
   //! param[out] nid_ id of the node
   unsigned give_id() const {
@@ -550,12 +553,13 @@ private:
   //! param[in] value 
   void check_double_precision(double& value);
 
+public:
+  // coordinates of node
+  Eigen::Matrix<double,1,dim> ncoord_;
 
 protected:
   // node ID
   unsigned nid_;
-  // coordinates of node
-  Eigen::Matrix<double,1,dim> ncoord_;
 
   // nodal solid velocity constraints
   std::vector<std::tuple<int, double> > nsolid_constraints_;

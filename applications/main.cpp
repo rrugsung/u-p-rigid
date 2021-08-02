@@ -80,6 +80,10 @@ int main (int argc, char* argv[]) {
 
   bool Contact = true;
 
+  //! MOVING MESH PARAMETERS
+  double soil_depth = 4.0;
+  double rigid_displacement;
+
   //! TIME STEP BEGINS
   unsigned step = 0;
   while (accumulate_time < total_analysis_time) {
@@ -95,7 +99,7 @@ int main (int argc, char* argv[]) {
 		<< "/" << total_analysis_time << " "
 		<< sub_time << " ms "
 		<< "total time: " << total_time << " ms \n";
-      file_handle.write_data(write_steps, particles);
+      file_handle.write_data(write_steps, particles, mesh);
       write_steps++;
       sub_time = 0.;
       //step++;
@@ -187,7 +191,7 @@ int main (int argc, char* argv[]) {
 
     //! UPDATE PARTICLES
     if (Contact)
-      particles->iterate_over_particles(std::bind(&mpm::Particle::update_contact_velocity_and_position, std::placeholders::_1, dt, accumulate_time));
+      particles->iterate_over_particles(std::bind(&mpm::Particle::update_contact_velocity_and_position, std::placeholders::_1, dt));
     else
       particles->iterate_over_particles(std::bind(&mpm::Particle::update_velocity_and_position, std::placeholders::_1, dt, accumulate_time));
         
@@ -205,6 +209,12 @@ int main (int argc, char* argv[]) {
       mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_nodal_pressure, std::placeholders::_1));
       particles->iterate_over_tp_particles(std::bind(&mpm::Particle::map_pore_pressure_from_nodes, std::placeholders::_1));
     }
+
+    rigid_displacement = particles->give_rigid_displ();
+    mesh->iterate_over_nodes(std::bind(&mpm::Node::update_mesh_configuration, std::placeholders::_1, rigid_displacement, soil_depth));
+    soil_depth = soil_depth + rigid_displacement;
+
+    std::cout << "rigid_displacement and soil_depth: \n" << rigid_displacement << "\n" << soil_depth << "\n";
 
     auto step_time = std::chrono::high_resolution_clock::now() - begin;
     auto duration = std::chrono::duration <double, std::milli> (step_time).count();

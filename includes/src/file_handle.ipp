@@ -80,7 +80,7 @@ mpm::MpmParticle* mpm::FileHandle::read_particles() {
 }
 
 
-void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles) {
+void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles, mpm::Mesh* &mesh) {
  
     std::string velocityFile = ResultsDir + "/velocity" + std::to_string(step) + ".vtk";
     std::string pressureFile = ResultsDir + "/pressure" + std::to_string(step) + ".vtk";
@@ -89,6 +89,7 @@ void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles) {
     std::string displacementFile   = ResultsDir + "/displacement" + std::to_string(step) + ".vtk";
     std::string plasticstrainFile = ResultsDir + "/plasticstrain" + std::to_string(step) + ".vtk";
     std::string deviatoricstrainFile = ResultsDir + "/deviatoricstrain" + std::to_string(step) + ".vtk";
+    //std::string meshFile = ResultsDir + "/mesh" + std::to_string(step) + ".vtk";
 
     std::ofstream velocityOut(velocityFile.c_str()); 
     std::ofstream pressureOut(pressureFile.c_str());
@@ -97,6 +98,7 @@ void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles) {
     std::ofstream displacementOut(displacementFile.c_str());
     std::ofstream plasticstrainOut(plasticstrainFile.c_str());
     std::ofstream deviatoricstrainOut(deviatoricstrainFile.c_str());
+    //std::ofstream meshOut(meshFile.c_str());
 
     particles->write_particle_velocity_data_to_file(velocityOut);
     particles->write_particle_pressure_data_to_file(pressureOut);
@@ -105,6 +107,7 @@ void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles) {
     particles->write_particle_displacement_data_to_file(displacementOut);
     particles->write_particle_plastic_strain_data_to_file(plasticstrainOut);
     particles->write_particle_deviatoric_strain_data_to_file(deviatoricstrainOut);
+    
 
     velocityOut.close();
     pressureOut.close();

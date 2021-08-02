@@ -79,6 +79,8 @@ public:
     return particles_.at(id);
   }
 
+  double give_rigid_displ ();
+  
   // give coordinates of the particle of given id
   //! param[out] coordinates of the particle at given id
   Eigen::Matrix<double, 1, dim> particle_coordinates(const unsigned& id) {

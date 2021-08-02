@@ -31,8 +31,7 @@ protected:
   unsigned beta_scalar_ = mpm::misc::scalar_beta_;
   static const unsigned numMats = mpm::constants::NUMBODIES;
 
-public:
-
+public: 
   // constructor
   //! param[in] id particle id
   //! param[in] mat_id material id
@@ -84,6 +83,11 @@ public:
   void update_material(const unsigned &id) {
     material_ = material_ptrs_.at(id);
   }
+
+  double give_rigid_displacement() {
+    return displacement_(1);
+  }
+
 //####################################
   // upadate nodal phase
   void update_nodal_phase();
@@ -159,7 +163,7 @@ public:
 
 //#####################################
   // update interface velocity
-  void update_contact_velocity_and_position(const double& dt, const double& time);
+  void update_contact_velocity_and_position(const double& dt);
   
   // update velocity
   void update_velocity_and_position(const double& dt, const double& time);

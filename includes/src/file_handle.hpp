@@ -61,7 +61,7 @@ public:
 
   // write output data to files
   //! param[in] step time step value
-    void write_data(unsigned &step, mpm::MpmParticle* &particles);
+    void write_data(unsigned &step, mpm::MpmParticle* &particles, mpm::Mesh* &mesh);
 
 };
 

@@ -64,6 +64,8 @@ void mpm::Node::initialise_node() {
   nphase_ = 1;
   material_ids_.clear();
 
+  penalty_factor_ = 0;
+
   nsolid_mass_     = 0.;
   nwater_mass_     = 0.;
   nmixture_mass_ = 0.;
@@ -207,6 +209,7 @@ void mpm::Node::matrix_test() {
     std::cout << "nsolid_final_velocities_: \n" << nsolid_final_velocities_ << " \n";
     std::cout << "nsolid_final_velocity_: \n" << nsolid_final_velocity_ << " \n\n"; 
     std::cout << "relative_velocities: \n" << nsolid_relative_velocities_ << "\n\n";
+    std::cout << "ncoord_: \n" << ncoord_ << "\n\n";
     std::cout << "=====================================================" << "\n\n";
   }
 }
@@ -478,6 +481,13 @@ void mpm::Node::apply_contact_mechanics(const double& dt){
       }
     //}
   }
+}
+
+void mpm::Node::update_mesh_configuration (double rigid_displacement, double soil_depth) {
+  if (ncoord_(1) >= soil_depth)
+    ncoord_(1) = ncoord_(1)+rigid_displacement;
+  else
+    ncoord_(1) = ncoord_(1)*((soil_depth-rigid_displacement)/soil_depth);
 }
 
 void mpm::Node::check_double_precision(double& value) {

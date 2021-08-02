@@ -101,6 +101,10 @@ void mpm::MpmParticle::assign_material_to_particles(std::vector<mpm::material::M
          particle->set_material(material_ptrs);
 }
 
+double mpm::MpmParticle::give_rigid_displ() {
+    double rigid_displ = sp_particles_.at(0) -> give_rigid_displacement();
+    return rigid_displ;
+}
 
 template<typename FP>
 void mpm::MpmParticle::iterate_over_particles(FP function) {
