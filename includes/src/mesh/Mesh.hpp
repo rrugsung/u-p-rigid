@@ -123,6 +123,9 @@ public:
       vec_of_nodes.push_back(i);
   }
 
+  // WRITE MESH DATA
+  void write_mesh_data_to_file(std::ostream& outFile);
+
 private:
   // free all dynamically allocated memory within "MeshBase" class
   void free_memory();

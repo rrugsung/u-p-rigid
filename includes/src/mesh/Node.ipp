@@ -487,7 +487,7 @@ void mpm::Node::update_mesh_configuration (double rigid_displacement, double soi
   if (ncoord_(1) >= soil_depth)
     ncoord_(1) = ncoord_(1)+rigid_displacement;
   else
-    ncoord_(1) = ncoord_(1)*((soil_depth-rigid_displacement)/soil_depth);
+    ncoord_(1) = ncoord_(1)*((soil_depth+rigid_displacement)/soil_depth);
 }
 
 void mpm::Node::check_double_precision(double& value) {

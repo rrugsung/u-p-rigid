@@ -22,6 +22,36 @@ void mpm::Mesh::iterate_over_nodes_of_p(FP function) const {
   return;
 }
 
+void mpm::Mesh::write_mesh_data_to_file(std::ostream& outFile) {
+    unsigned numofnodes = nodes_.size();
+    unsigned numofelements = elements_.size();
+
+    outFile << "# vtk DataFile Version 2.0" << "\n";
+    outFile << "MPM Mesh Data" << "\n";
+    outFile << "ASCII" << "\n" << "DATASET UNSTRUCTURED_GRID" << "\n";
+    outFile << "POINTS " << numofnodes << " float " << "\n";
+
+    Eigen::Matrix<double,1,dim> nCord;
+    for (auto i : nodes_){
+        nCord = i->give_node_coordinates();
+        if (dim == 2)
+            outFile << nCord(0) << " " << nCord(1) << " " << "0" << "\n";
+        if (dim == 3)
+            outFile << nCord(0) << " " << nCord(1) << " " << nCord(2) << "\n";
+    }
+
+    outFile << "CELLS " << numofelements << " " << 5*numofelements << "\n";
+    Eigen::Matrix<unsigned,1,numNodes> nIds;
+    for (auto i : elements_) {
+        nIds = i->give_element_node_ids();
+        outFile << numNodes << " " << nIds(0) << " " << nIds(1) 
+                << " " << nIds(2) << " " << nIds(3) << "\n";
+    }
+
+    outFile << "CELL_TYPES " << numofelements << "\n";
+    for (unsigned i=0; i<numofelements; i++)
+        outFile << "1" << "\n";
+}
 
 void mpm::Mesh::initialise_mesh() {
   p_element_set_.clear();

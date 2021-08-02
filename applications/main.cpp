@@ -187,7 +187,7 @@ int main (int argc, char* argv[]) {
     // APPLY CONTACT MECHANICS
     mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_multimaterial_relative_velocities, std::placeholders::_1));
     mesh -> iterate_over_nodes_of_p(std::bind(&mpm::Node::apply_contact_mechanics, std::placeholders::_1, dt));
-    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::matrix_test, std::placeholders::_1));
+    //mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::matrix_test, std::placeholders::_1));
 
     //! UPDATE PARTICLES
     if (Contact)
@@ -213,8 +213,6 @@ int main (int argc, char* argv[]) {
     rigid_displacement = particles->give_rigid_displ();
     mesh->iterate_over_nodes(std::bind(&mpm::Node::update_mesh_configuration, std::placeholders::_1, rigid_displacement, soil_depth));
     soil_depth = soil_depth + rigid_displacement;
-
-    std::cout << "rigid_displacement and soil_depth: \n" << rigid_displacement << "\n" << soil_depth << "\n";
 
     auto step_time = std::chrono::high_resolution_clock::now() - begin;
     auto duration = std::chrono::duration <double, std::milli> (step_time).count();
