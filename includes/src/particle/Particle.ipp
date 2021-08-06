@@ -45,6 +45,7 @@ void mpm::Particle::print_id(){
 void mpm::Particle::initialise_particle() {
     solid_strain_rate_ = Eigen::Matrix<double, 1, dof>::Zero();
     solid_centre_strain_rate_ = Eigen::Matrix<double, 1, dof>::Zero();
+    du_ = Eigen::Matrix<double,1,dim>::Zero();
 }
 
 void mpm::Particle::set_initial_pore_pressure(double &initial_pressure) {
@@ -391,6 +392,7 @@ void mpm::Particle::update_contact_velocity_and_position(const double& dt) {
   displacement_ += (dt * temp_solid_final_velocity);
   //solid_velocity_ += (dt * temp_solid_final_acceleration);
   solid_velocity_ = temp_solid_final_velocity;
+  du_ = dt*temp_solid_final_velocity;
 }
 
 void mpm::Particle::update_velocity_and_position(const double& dt,
@@ -417,7 +419,6 @@ void mpm::Particle::update_velocity_and_position(const double& dt,
   coord_ += (dt * temp_solid_final_velocity);
   displacement_ += (dt * temp_solid_final_velocity);
   solid_velocity_ += (dt * temp_solid_final_acceleration);
-  du_ = dt*temp_solid_final_velocity;
   //solid_velocity_ = temp_solid_final_velocity;
   //solid_velocity_ += temp_solid_inc_velocity;
 }

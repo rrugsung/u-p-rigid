@@ -213,6 +213,8 @@ int main (int argc, char* argv[]) {
     rigid_displacement = particles->give_rigid_displ();
     mesh->iterate_over_nodes(std::bind(&mpm::Node::update_mesh_configuration, std::placeholders::_1, rigid_displacement, soil_depth));
     soil_depth = soil_depth + rigid_displacement;
+    //std::cout << "rigid displacement: \n" << rigid_displacement << "\n";
+    //std::cout << "soil_depth: \n" << soil_depth << "\n";
 
     auto step_time = std::chrono::high_resolution_clock::now() - begin;
     auto duration = std::chrono::duration <double, std::milli> (step_time).count();
