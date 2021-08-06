@@ -50,7 +50,7 @@ void mpm::Mesh::write_mesh_data_to_file(std::ostream& outFile) {
 
     outFile << "CELL_TYPES " << numofelements << "\n";
     for (unsigned i=0; i<numofelements; i++)
-        outFile << "1" << "\n";
+        outFile << "9" << "\n";
 }
 
 void mpm::Mesh::initialise_mesh() {

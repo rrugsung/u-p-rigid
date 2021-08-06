@@ -49,7 +49,6 @@ int main (int argc, char* argv[]) {
 
   mpm::FileHandle file_handle(p);
   mpm::Mesh* mesh = file_handle.read_mesh();
-  mesh->iterate_over_elements(std::bind(&mpm::Element::compute_centre_coordinates, std::placeholders::_1));
   mpm::MpmParticle* particles = file_handle.read_particles();
   double const_permeability = mpm::misc::permeability_;
   double fluid_compressibility = mpm::misc::compressibility_;
@@ -107,6 +106,7 @@ int main (int argc, char* argv[]) {
 
     //! LOCATE PARTICLES IN THE MESH AND COMPUTE SHAPE FUNCTIONS
     mesh->locate_particles_in_mesh(particles);
+    mesh->iterate_over_elements(std::bind(&mpm::Element::compute_centre_coordinates, std::placeholders::_1));
     particles->iterate_over_particles(std::bind(&mpm::Particle::compute_local_coordinates, std::placeholders::_1));
     particles->iterate_over_particles(std::bind(&mpm::Particle::compute_shape_functions, std::placeholders::_1));
     particles->iterate_over_particles(std::bind(&mpm::Particle::compute_global_derivatives_shape_functions, std::placeholders::_1));

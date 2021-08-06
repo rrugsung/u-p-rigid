@@ -417,11 +417,10 @@ void mpm::Particle::update_velocity_and_position(const double& dt,
   coord_ += (dt * temp_solid_final_velocity);
   displacement_ += (dt * temp_solid_final_velocity);
   solid_velocity_ += (dt * temp_solid_final_acceleration);
+  du_ = dt*temp_solid_final_velocity;
   //solid_velocity_ = temp_solid_final_velocity;
   //solid_velocity_ += temp_solid_inc_velocity;
 }
-
-
 
 void mpm::Particle::update_pressure() {
   double temp_pressure = 0.;

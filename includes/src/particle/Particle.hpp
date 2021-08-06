@@ -85,7 +85,7 @@ public:
   }
 
   double give_rigid_displacement() {
-    return displacement_(1);
+    return du_(1);
   }
 
 //####################################
@@ -323,6 +323,7 @@ protected:
   double water_mass_;
 
   // Acceleration and Velocity
+  Eigen::Matrix<double, 1, dim> du_;
   Eigen::Matrix<double, 1, dim> solid_velocity_;
   Eigen::Matrix<double, 1, dim> water_velocity_;
   Eigen::Matrix<double, 1, dim> solid_acceleration_;
