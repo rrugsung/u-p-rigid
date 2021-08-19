@@ -350,12 +350,14 @@ void mpm::Mesh::compute_rigid_body_int_acceleration() {
     double rigid_mass = 0;
     Eigen::Matrix<double,1,dim> mixture_body_force = Eigen::Matrix<double,1,dim>::Zero();
     Eigen::Matrix<double,1,dim> mixture_int_force = Eigen::Matrix<double,1,dim>::Zero();
+    Eigen::Matrix<double,1,dim> mixture_trac_force = Eigen::Matrix<double,1,dim>::Zero();
     for (const auto &n_ptr : p_node_set_) {
         std::set<unsigned> material_ids = n_ptr->material_ids_;
         if (material_ids.find(1) != material_ids.end()) {
             rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(1);
             mixture_body_force = mixture_body_force + n_ptr->give_node_multimaterial_mixture_body_forces(1)
                                 + n_ptr->give_node_multimaterial_mixture_body_forces(0);
+            mixture_trac_force = mixture_trac_force + n_ptr->give_node_multimaterial_mixture_trac_forces(1);
             Eigen::Matrix<double,1,dim> internal_force = n_ptr->give_node_multimaterial_mixture_internal_forces(0);
             Eigen::Matrix<double,1,dim> normal_vector = Eigen::Matrix<double,1,dim>::Zero();
             //normal vector is set to (0,1) as the simulation is symmetric
@@ -368,9 +370,10 @@ void mpm::Mesh::compute_rigid_body_int_acceleration() {
     // compute rigid body acceleration
     Eigen::Matrix<double,1,dim> rigid_acceleration = Eigen::Matrix<double,1,dim>::Zero();
     if (rigid_mass > 1.E-15) {
-        rigid_acceleration = (mixture_body_force + mixture_int_force) / rigid_mass;
+        rigid_acceleration = (mixture_trac_force + mixture_body_force + mixture_int_force) / rigid_mass;
         //std::cout << "mixture_body_force: \n" << mixture_body_force << "\n";
         //std::cout << "mixture_int_force: \n" << mixture_int_force << "\n";
+        //std::cout << "mixture_trac_force: \n" << mixture_trac_force << "\n";
         //std::cout << "int_rigid_acc_: \n" << rigid_acceleration << "\n";
     }
     for (const auto &n_ptr : p_node_set_) {
@@ -386,6 +389,7 @@ void mpm::Mesh::compute_rigid_body_final_acceleration() {
     double rigid_mass = 0;
     Eigen::Matrix<double,1,dim> mixture_body_force = Eigen::Matrix<double,1,dim>::Zero();
     Eigen::Matrix<double,1,dim> mixture_int_force = Eigen::Matrix<double,1,dim>::Zero();
+    Eigen::Matrix<double,1,dim> mixture_trac_force = Eigen::Matrix<double,1,dim>::Zero();
     Eigen::Matrix<double,1,dim> KS2_force = Eigen::Matrix<double,1,dim>::Zero();
     for (const auto &n_ptr : p_node_set_) {
         std::set<unsigned> material_ids = n_ptr->material_ids_;
@@ -393,6 +397,7 @@ void mpm::Mesh::compute_rigid_body_final_acceleration() {
             rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(1);
             mixture_body_force = mixture_body_force + n_ptr->give_node_multimaterial_mixture_body_forces(1)
                                 + n_ptr->give_node_multimaterial_mixture_body_forces(0);
+            mixture_trac_force = mixture_trac_force + n_ptr->give_node_multimaterial_mixture_trac_forces(1);
             KS2_force = n_ptr->give_node_KS2_forces();
             Eigen::Matrix<double,1,dim> internal_force = n_ptr->give_node_multimaterial_mixture_internal_forces(0)
                                         - KS2_force;
@@ -408,8 +413,9 @@ void mpm::Mesh::compute_rigid_body_final_acceleration() {
     // compute rigid body acceleration
     Eigen::Matrix<double,1,dim> rigid_acceleration = Eigen::Matrix<double,1,dim>::Zero();
     if (rigid_mass > 1.E-15) {
-        rigid_acceleration = (mixture_body_force + mixture_int_force) / rigid_mass;
+        rigid_acceleration = (mixture_trac_force + mixture_body_force + mixture_int_force) / rigid_mass;
         //std::cout << "mixture_body_force: \n" << mixture_body_force << "\n";
+        //std::cout << "mixture_trac_force: \n" << mixture_trac_force << "\n";
         //std::cout << "mixture_int_force: \n" << mixture_int_force << "\n";
         //std::cout << "KS2_Force: \n" << KS2_force << "\n";
         //std::cout << "final_rigid_acc_: \n" << rigid_acceleration << "\n";

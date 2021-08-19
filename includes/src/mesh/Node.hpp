@@ -427,6 +427,12 @@ public:
   Eigen::Matrix<double,1,dim> give_node_multimaterial_mixture_body_forces(unsigned mat_id) const {
     return nmixture_body_forces_.row(mat_id);
   }
+  
+  // give nodal multimaterial mixture body force
+  //! param[out] nmixture_body_forces
+  Eigen::Matrix<double,1,dim> give_node_multimaterial_mixture_trac_forces(unsigned mat_id) const {
+    return nmixture_trac_forces_.row(mat_id);
+  }
 
   // give nodal multimaterial internal body force
   //! param[out] nmixture_int_forces

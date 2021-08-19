@@ -80,7 +80,7 @@ int main (int argc, char* argv[]) {
   bool Contact = true;
 
   //! MOVING MESH PARAMETERS
-  double soil_depth = 4.0;
+  double soil_depth = 1.0;
   double rigid_displacement;
 
   //! TIME STEP BEGINS
@@ -157,7 +157,7 @@ int main (int argc, char* argv[]) {
     // COMPUTE MULTIMATERIAL UNIT NORMAL VECTOR
     particles->iterate_over_particles(std::bind(&mpm::Particle::map_multimaterial_domain_gradients, std::placeholders::_1));
     mesh -> iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_multimaterial_normal_unit_vectors, std::placeholders::_1));
-    particles->iterate_over_sp_particles(std::bind(&mpm::Particle::compute_penalty_factor, std::placeholders::_1));
+    //particles->iterate_over_sp_particles(std::bind(&mpm::Particle::compute_penalty_factor, std::placeholders::_1));
     // mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_nodal_damping_forces, std::placeholders::_1,damping_factor));
 
     
