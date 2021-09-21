@@ -346,7 +346,7 @@ void mpm::Mesh::give_elements_with_particles_above_cutoff(std::vector<mpm::Eleme
     }
 }
 
-void mpm::Mesh::compute_rigid_body_int_acceleration() {
+void mpm::Mesh::compute_rigid_body_int_acceleration(const double &time) {
     double rigid_mass = 0;
     Eigen::Matrix<double,1,dim> mixture_body_force = Eigen::Matrix<double,1,dim>::Zero();
     Eigen::Matrix<double,1,dim> mixture_int_force = Eigen::Matrix<double,1,dim>::Zero();
@@ -367,8 +367,10 @@ void mpm::Mesh::compute_rigid_body_int_acceleration() {
             mixture_int_force = mixture_int_force + int_normal_force;
         }
     }
+
     // compute rigid body acceleration
     Eigen::Matrix<double,1,dim> rigid_acceleration = Eigen::Matrix<double,1,dim>::Zero();
+
     if (rigid_mass > 1.E-15) {
         rigid_acceleration = (mixture_trac_force + mixture_body_force + mixture_int_force) / rigid_mass;
         //std::cout << "mixture_body_force: \n" << mixture_body_force << "\n";
@@ -385,7 +387,7 @@ void mpm::Mesh::compute_rigid_body_int_acceleration() {
     }
 }
 
-void mpm::Mesh::compute_rigid_body_final_acceleration() {
+void mpm::Mesh::compute_rigid_body_final_acceleration(const double &time) {
     double rigid_mass = 0;
     Eigen::Matrix<double,1,dim> mixture_body_force = Eigen::Matrix<double,1,dim>::Zero();
     Eigen::Matrix<double,1,dim> mixture_int_force = Eigen::Matrix<double,1,dim>::Zero();
@@ -412,6 +414,7 @@ void mpm::Mesh::compute_rigid_body_final_acceleration() {
     }
     // compute rigid body acceleration
     Eigen::Matrix<double,1,dim> rigid_acceleration = Eigen::Matrix<double,1,dim>::Zero();
+
     if (rigid_mass > 1.E-15) {
         rigid_acceleration = (mixture_trac_force + mixture_body_force + mixture_int_force) / rigid_mass;
         //std::cout << "mixture_body_force: \n" << mixture_body_force << "\n";

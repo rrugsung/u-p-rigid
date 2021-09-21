@@ -161,7 +161,7 @@ int main (int argc, char* argv[]) {
     // mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_nodal_damping_forces, std::placeholders::_1,damping_factor));
 
     
-    mesh->compute_rigid_body_int_acceleration();
+    mesh->compute_rigid_body_int_acceleration(accumulate_time);
     
     // COMPUTE INTERMEDIATE RIGID BODY ACCELERATION
     // BUILD MATRICES FOR THE CG SEMI-IMPLICIT SOLVER
@@ -181,7 +181,7 @@ int main (int argc, char* argv[]) {
     solver->assign_final_acceleration_force_to_nodes();
 
     // COMPUTE FINAL ACCELERATIONS AND VELOCITIES
-    mesh->compute_rigid_body_final_acceleration();
+    mesh->compute_rigid_body_final_acceleration(accumulate_time);
     mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_final_solid_acceleration, std::placeholders::_1, 1, dt));
 
     // APPLY CONTACT MECHANICS

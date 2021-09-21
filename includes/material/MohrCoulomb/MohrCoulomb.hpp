@@ -22,6 +22,7 @@ File: MohrCoulomb.hpp
 #include "MaterialBase.hpp"
 #include "PropertyParse.hpp"
 #include "Constants.hpp" 
+#include "Material_utility.hpp"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -72,6 +73,8 @@ public:
     return permeability_;
   }
 
+  enum FailureState {Elastic, Tensile, Shear};
+
   //! compute elastic stiffness matrix
   void compute_elastic_stiffness_matrix();
 
@@ -87,41 +90,29 @@ public:
   void compute_stress(const Eigen::Matrix<double,1,dof>& dstrain,
 		      Eigen::Matrix<double,1,6>& stress, double& epds);
 
+  //! Compute yield function and yield state
+  //! \param[in] state_vars History-dependent state variables
+  //! \retval yield_type Yield type (elastic, shear or tensile)
+  mpm::material::MohrCoulomb::FailureState compute_yield_state(
+    Eigen::Matrix<double, 2, 1>* yield_function, double epsilon, double rho, double theta, double phi, double cohesion);
+
 private:  
-  void compute_rho_theta(const VectorD6x1 stress, double& _j2, double& _j3);
-  Eigen::Matrix<double,6,2> compute_dFdP(const double _j2,const double _j3,
-					 const VectorD6x1 _devstress,
-					 double& _psoftening);
+  void compute_stress_invariants(const VectorD6x1 stress);
+  void compute_df_dp(mpm::material::MohrCoulomb::FailureState yield_type,
+    const VectorD6x1& stress, VectorD6x1* df_dsigma, VectorD6x1* dp_dsigma, const double rho, const double theta, 
+    const double phi, const double psi, double pdstrain, double* dp_dq, double* softening);
   void compute_lambda_trial();
 
 
 protected:
-  Matrix6x6 De_;
+  Matrix6x6 de_;
   double density_;
   double porosity_;
   double permeability_;
-  double E_;
-  double mu_;
-  double t_;
 
-  // initial values
-  double phi_;
-  double c_;
-  double psi_;
-
-  // residual values
-  double phi_resd_;
-  double c_resd_;
-  double psi_resd_;
-
-  // current values
-  double phi_cur_;
-  double c_cur_;
-  double psi_cur_;
-
-  // plastic deviatoric strain
-  double epds_peak_;
-  double epds_crit_;
+  double phi_cur;
+  double psi_cur;
+  double cohesion_cur;
 
   // plastic deviatori strain vector
   double epds_;
@@ -131,6 +122,32 @@ protected:
   double rho_;
   double theta_;
   double epsilon_;
+
+  double youngs_modulus_{std::numeric_limits<double>::max()};
+  //! Bulk modulus
+  double bulk_modulus_{std::numeric_limits<double>::max()};
+  //! Shear modulus
+  double shear_modulus_{std::numeric_limits<double>::max()};
+  //! Poisson ratio
+  double poisson_ratio_{std::numeric_limits<double>::max()};
+  //! Maximum friction angle phi
+  double phi_peak_{std::numeric_limits<double>::max()};
+  //! Maximum dilation angle psi
+  double psi_peak_{std::numeric_limits<double>::max()};
+  //! Maximum cohesion
+  double cohesion_peak_{std::numeric_limits<double>::max()};
+  //! Residual friction angle phi
+  double phi_residual_{std::numeric_limits<double>::max()};
+  //! Residual dilation angle psi
+  double psi_residual_{std::numeric_limits<double>::max()};
+  //! Residual cohesion
+  double cohesion_residual_{std::numeric_limits<double>::max()};
+  //! Peak plastic deviatoric strain
+  double pdstrain_peak_{std::numeric_limits<double>::max()};
+  //! Residual plastic deviatoric strain
+  double pdstrain_residual_{std::numeric_limits<double>::max()};
+  //! Tension cutoff
+  double tension_cutoff_{std::numeric_limits<double>::max()};
 };
 
 #include "MohrCoulomb.ipp"

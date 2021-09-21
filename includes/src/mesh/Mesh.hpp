@@ -79,9 +79,9 @@ public:
   //! param[in] pressure prescribed pressure value
   void prescribe_pressure_at_free_surface(const double &pressure);
 
-  void compute_rigid_body_int_acceleration();
+  void compute_rigid_body_int_acceleration(const double &time);
 
-  void compute_rigid_body_final_acceleration();
+  void compute_rigid_body_final_acceleration(const double &time);
 
   template<typename FP>
   void iterate_over_elements(FP function) const;

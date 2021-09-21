@@ -83,7 +83,7 @@ bool mpm::ProjectionSolver::solve_pressure_poisson_equation(const double& dt) {
   //std::cout << "int_solid_vel: \n" << intermediate_solid_velocity_ << "\n";
   //std::cout << "int_water_vel: \n" << intermediate_water_velocity_ << "\n";
   //std::cout << "pressure_: \n" << pressure_ <<  "\n";
-  //std::cout << "============================================="" << "\n\n";
+  //std::cout << "=============================================" << "\n\n";
 
   //for (unsigned i = 0; i < pressure_.size(); i++) {
   //   if (std::fabs(pressure_(i)) < 1.0E2)
