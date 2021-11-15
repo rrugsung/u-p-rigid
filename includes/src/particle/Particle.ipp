@@ -252,9 +252,6 @@ void mpm::Particle::assign_traction_force_to_nodes(bool contact, const double &t
     for (unsigned j = 0; j < solid_traction_.size(); j++) {
       unsigned direction = std::get<0>(solid_traction_.at(j));
       double total_traction =std::get<1>(solid_traction_.at(j));
-      if (time <= 0.1) {
-          total_traction = total_traction*time*10;
-      }
       ntotal_traction(direction) += shape_fun_(i) * total_traction * volume_ / spacing_(direction);
     } 
     nodes_(i)->assign_traction_force(ntotal_traction, nwater_traction);
@@ -272,21 +269,10 @@ void mpm::Particle::assign_sp_traction_force_to_nodes(bool contact, const double
     for (unsigned j = 0; j < solid_traction_.size(); j++) {
       unsigned direction = std::get<0>(solid_traction_.at(j));
       double total_traction =std::get<1>(solid_traction_.at(j));
-      
-      if (time <= 0.1){
-        double x = time*10;
-        total_traction = total_traction*(pow(x,3)*(10 - 15*x + 6*pow(x,2)));
+      if (time <= 1){
+         double x = time;
+         total_traction = total_traction*(pow(x,3)*(10 - 15*x + 6*pow(x,2)));
       }
-      else if (0.1 < time && time <= 0.2) {
-        total_traction = total_traction;
-      }
-      else if (0.2 < time && time <= 0.3) {
-        double x = 10*(time-0.2);
-        total_traction = total_traction*(1 + 1.5*(pow(x,3)*(10 - 15*x + 6*pow(x,2))));
-      }
-      else
-        total_traction = 2.5*total_traction;
-
       ntotal_traction(direction) += shape_fun_(i) * total_traction * volume_ / spacing_(direction);
     } 
     nodes_(i)->assign_traction_force(ntotal_traction, nwater_traction);

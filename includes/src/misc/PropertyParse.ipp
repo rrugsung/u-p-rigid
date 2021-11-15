@@ -32,17 +32,6 @@ void mpm::misc::PARSE_INPUT_PARAMETERS(std::string& iLine) {
             abort();
         }
     }
-
-    if (par == "contact") {
-        try {
-            contact = boost::lexical_cast<int>(*parameter);
-            }
-        catch (const boost::bad_lexical_cast &) {
-            std::cerr << "ERROR: failed to parse input parameter contact" << "\n";
-            abort();
-        }
-    }
-
     if (par == "dt") {
         try {
             dt_ = boost::lexical_cast<double>(*parameter);
@@ -93,7 +82,7 @@ void mpm::misc::PARSE_INPUT_PARAMETERS(std::string& iLine) {
             damping_coefficient_ = boost::lexical_cast<double>(*parameter);
         }
         catch (const boost::bad_lexical_cast &) {
-            std::cerr << "ERROR: failed to parse input parameter scalarBeta" << "\n";
+            std::cerr << "ERROR: failed to parse input parameter dampingCoefficient" << "\n";
             abort();
         }
     }
@@ -102,7 +91,7 @@ void mpm::misc::PARSE_INPUT_PARAMETERS(std::string& iLine) {
             permeability_ = boost::lexical_cast<double>(*parameter);
         }
         catch (const boost::bad_lexical_cast &) {
-            std::cerr << "ERROR: failed to parse input parameter scalarBeta" << "\n";
+            std::cerr << "ERROR: failed to parse input parameter constantPermeability" << "\n";
             abort();
         }
     }
@@ -111,7 +100,7 @@ void mpm::misc::PARSE_INPUT_PARAMETERS(std::string& iLine) {
             Gamma = boost::lexical_cast<double>(*parameter);
         }
         catch (const boost::bad_lexical_cast &) {
-            std::cerr << "ERROR: failed to parse input parameter scalarBeta" << "\n";
+            std::cerr << "ERROR: failed to parse input parameter NewmarkGamma" << "\n";
             abort();
         }
     }
@@ -120,7 +109,7 @@ void mpm::misc::PARSE_INPUT_PARAMETERS(std::string& iLine) {
             Beta = boost::lexical_cast<double>(*parameter);
         }
         catch (const boost::bad_lexical_cast &) {
-            std::cerr << "ERROR: failed to parse input parameter scalarBeta" << "\n";
+            std::cerr << "ERROR: failed to parse input parameter NewmarkBeta" << "\n";
             abort();
         }
     }
@@ -129,7 +118,16 @@ void mpm::misc::PARSE_INPUT_PARAMETERS(std::string& iLine) {
             compressibility_ = boost::lexical_cast<double>(*parameter);
         }
         catch (const boost::bad_lexical_cast &) {
-            std::cerr << "ERROR: failed to parse input parameter scalarBeta" << "\n";
+            std::cerr << "ERROR: failed to parse input parameter compressibility" << "\n";
+            abort();
+        }
+    }
+    if (par == "soilDepth") {
+        try {
+            soil_depth_ = boost::lexical_cast<double>(*parameter);
+        }
+        catch (const boost::bad_lexical_cast &) {
+            std::cerr << "ERROR: failed to parse input parameter soilDepth" << "\n";
             abort();
         }
     }

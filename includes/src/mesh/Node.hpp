@@ -131,6 +131,12 @@ public:
 
   // assign multimaterial solid intermediate accelerations
   //! param[in] mat_id, nsolid_int_accelerations_
+  void assign_multimaterial_nsolid_initial_velocities(const unsigned mat_id, const Eigen::Matrix<double,1,dim>& velocity){
+    nsolid_initial_velocities_.row(mat_id) = velocity;
+  }
+
+  // assign multimaterial solid intermediate accelerations
+  //! param[in] mat_id, nsolid_int_accelerations_
   void assign_multimaterial_nsolid_int_accelerations(const unsigned mat_id, const Eigen::Matrix<double,1,dim>& acceleration){
     nsolid_int_accelerations_.row(mat_id) = acceleration;
   }
@@ -226,6 +232,7 @@ public:
   
   void matrix_test();
 
+  void write_para_data(std::ostream& oFile);
   // compute the damping forces
   void compute_nodal_damping_forces(const double &alpha) {};
 
@@ -241,9 +248,9 @@ public:
   void assign_multimaterial_nodal_intrmd_masses(const unsigned mat_id, const double& intrmd_mass) {
     nintrmd_masses_(mat_id) += intrmd_mass;
   }
-  void compute_intermediate_solid_acceleration(const unsigned index, const double& dt);
-  void compute_intermediate_water_velocity(const unsigned index);
-  void compute_final_solid_acceleration(const unsigned index, const double& dt);
+  void compute_intermediate_solid_acceleration(const double& dt);
+  void compute_intermediate_water_velocity();
+  void compute_final_solid_acceleration(const double& dt);
   void compute_sp_final_solid_acceleration(const unsigned index, const double& dt);
 
   // compute multimaterial relative velocities

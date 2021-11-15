@@ -1,6 +1,6 @@
 # written by Shyamini Kularathna
 
-WORK_DIR = /home/chihunsung/Documents/u-p-rigid
+WORK_DIR = /home/chihun/MPM/u-p-rigid
 
 # compiler/linker
 C_PP = g++

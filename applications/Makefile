@@ -1,5 +1,5 @@
 # working directory: **this should be changed to find it automatically**
-MPM_DIR = /home/chihunsung/Documents/u-p-rigid
+MPM_DIR = /home/chihun/MPM/u-p-rigid
 
 
 # include the common information

@@ -53,6 +53,15 @@ void mpm::Mesh::write_mesh_data_to_file(std::ostream& outFile) {
         outFile << "9" << "\n";
 }
 
+void mpm::Mesh::write_para_data_to_file(std::ostream& outFile) {
+    for (auto i : nodes_){
+        unsigned nid = i -> give_id();
+        if (nid == 43) {
+            i->write_para_data(outFile);
+        }
+    }
+}
+
 void mpm::Mesh::initialise_mesh() {
   p_element_set_.clear();
   solver_element_set_.clear();
@@ -346,6 +355,32 @@ void mpm::Mesh::give_elements_with_particles_above_cutoff(std::vector<mpm::Eleme
     }
 }
 
+void mpm::Mesh::compute_rigid_body_initial_velocity() {
+    unsigned nnode = 0;
+    Eigen::Matrix<double,1,dim> initial_velocity = Eigen::Matrix<double,1,dim>::Zero();
+    Eigen::Matrix<double,1,dim> unit_normal_vector = Eigen::Matrix<double,1,dim>::Zero();
+    Eigen::Matrix<double,1,dim> rigid_initial_velocity = Eigen::Matrix<double,1,dim>::Zero();
+    for (const auto &n_ptr : p_node_set_) {
+        std::set<unsigned> material_ids = n_ptr->material_ids_;
+        if (material_ids.size() == 2) {
+            unit_normal_vector = n_ptr -> give_node_multimaterial_normal_vectors(0);
+            if (unit_normal_vector(1) - 1 < 1E-15) {
+                initial_velocity += n_ptr -> give_node_solid_initial_velocity();
+                nnode = nnode + 1;
+            }
+        }
+    }
+    rigid_initial_velocity(1) = initial_velocity(1)/nnode;
+
+    for (const auto &n_ptr : p_node_set_) {
+        std::set<unsigned> material_ids = n_ptr->material_ids_;
+        if (material_ids.find(1) != material_ids.end()){
+            n_ptr->assign_multimaterial_nsolid_initial_velocities(1,rigid_initial_velocity);
+            //n_ptr->assign_nsolid_int_acceleration(rigid_acceleration);
+        }
+    }
+}
+
 void mpm::Mesh::compute_rigid_body_int_acceleration(const double &time) {
     double rigid_mass = 0;
     Eigen::Matrix<double,1,dim> mixture_body_force = Eigen::Matrix<double,1,dim>::Zero();
@@ -354,7 +389,7 @@ void mpm::Mesh::compute_rigid_body_int_acceleration(const double &time) {
     for (const auto &n_ptr : p_node_set_) {
         std::set<unsigned> material_ids = n_ptr->material_ids_;
         if (material_ids.find(1) != material_ids.end()) {
-            rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(1);
+            //rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(1);
             mixture_body_force = mixture_body_force + n_ptr->give_node_multimaterial_mixture_body_forces(1)
                                 + n_ptr->give_node_multimaterial_mixture_body_forces(0);
             mixture_trac_force = mixture_trac_force + n_ptr->give_node_multimaterial_mixture_trac_forces(1);
@@ -366,6 +401,9 @@ void mpm::Mesh::compute_rigid_body_int_acceleration(const double &time) {
             Eigen::Matrix<double,1,dim> int_normal_force = force_normal*normal_vector;
             mixture_int_force = mixture_int_force + int_normal_force;
         }
+        if (material_ids.size() == 2) {
+            rigid_mass += n_ptr-> give_node_mixture_mass();
+        }
     }
 
     // compute rigid body acceleration
@@ -373,6 +411,7 @@ void mpm::Mesh::compute_rigid_body_int_acceleration(const double &time) {
 
     if (rigid_mass > 1.E-15) {
         rigid_acceleration = (mixture_trac_force + mixture_body_force + mixture_int_force) / rigid_mass;
+        //std::cout << "rigid_mass: \n" << rigid_mass << "\n";
         //std::cout << "mixture_body_force: \n" << mixture_body_force << "\n";
         //std::cout << "mixture_int_force: \n" << mixture_int_force << "\n";
         //std::cout << "mixture_trac_force: \n" << mixture_trac_force << "\n";
@@ -396,7 +435,7 @@ void mpm::Mesh::compute_rigid_body_final_acceleration(const double &time) {
     for (const auto &n_ptr : p_node_set_) {
         std::set<unsigned> material_ids = n_ptr->material_ids_;
         if (material_ids.find(1) != material_ids.end()) {
-            rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(1);
+            //rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(1);
             mixture_body_force = mixture_body_force + n_ptr->give_node_multimaterial_mixture_body_forces(1)
                                 + n_ptr->give_node_multimaterial_mixture_body_forces(0);
             mixture_trac_force = mixture_trac_force + n_ptr->give_node_multimaterial_mixture_trac_forces(1);
@@ -410,6 +449,9 @@ void mpm::Mesh::compute_rigid_body_final_acceleration(const double &time) {
             Eigen::Matrix<double,1,dim> int_normal_force = force_normal*normal_vector;
             mixture_int_force = mixture_int_force + int_normal_force;
             
+        }
+        if (material_ids.size() == 2) {
+            rigid_mass += n_ptr-> give_node_mixture_mass();
         }
     }
     // compute rigid body acceleration

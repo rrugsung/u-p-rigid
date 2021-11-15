@@ -31,9 +31,6 @@ namespace mpm {
     bool gravity;
     unsigned forceType;
     bool freeSurface;
-
-    bool contact;
-
     double dt_;
     double total_time_;
     double load_step_;
@@ -44,6 +41,7 @@ namespace mpm {
     double Beta;
     double permeability_;
     double compressibility_;
+    double soil_depth_;
     std::map<std::string, double> propertyList;
 
     void READ_PROPERTIES(std::string& line);

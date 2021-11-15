@@ -55,7 +55,6 @@ void mpm::ProjectionSolver::assemble_solver(mpm::Mesh* mesh_ptr) {
 
 bool mpm::ProjectionSolver::solve_pressure_poisson_equation(const double& dt) {
   stiffness_matrix_ =  L_;
-
   intermediate_solid_velocity_.resize(velocity_dof_);
   intermediate_water_velocity_.resize(velocity_dof_);
   unsigned node = 0;
@@ -74,17 +73,7 @@ bool mpm::ProjectionSolver::solve_pressure_poisson_equation(const double& dt) {
   this->apply_pressure_boundary_conditions_to_system();
   if (!Conjugate_Gradient(pressure_))
     std::cerr << "Failed solving Poisson equation using CG" << "\n";
-  //std::cout << "Solving pressure poisson eq." "\n";
-  //std::cout << "force_vector (399): \n" << force_vector_(399) << "\n";
-  //std::cout << "force_vector (400): \n" << force_vector_(400) << "\n";
-  //std::cout << "force_vector (420): \n" << force_vector_(420) << "\n";
-  //std::cout << "force_vector (421): \n" << force_vector_(421) << "\n";
-  //std::cout << "L_: \n" << stiffness_matrix_ << "\n";
-  //std::cout << "int_solid_vel: \n" << intermediate_solid_velocity_ << "\n";
-  //std::cout << "int_water_vel: \n" << intermediate_water_velocity_ << "\n";
-  //std::cout << "pressure_: \n" << pressure_ <<  "\n";
-  //std::cout << "=============================================" << "\n\n";
-
+    
   //for (unsigned i = 0; i < pressure_.size(); i++) {
   //   if (std::fabs(pressure_(i)) < 1.0E2)
   //     pressure_(i) = 0.;

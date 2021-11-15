@@ -63,6 +63,9 @@ public:
   //! param[in] step time step value
     void write_data(unsigned &step, mpm::MpmParticle* &particles, mpm::Mesh* &mesh);
 
+    void write_para_data(unsigned &step, mpm::Mesh* &mesh);
+
+
 };
 
 #include "file_handle.ipp"

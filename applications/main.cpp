@@ -80,7 +80,8 @@ int main (int argc, char* argv[]) {
   bool Contact = true;
 
   //! MOVING MESH PARAMETERS
-  double soil_depth = 1.0;
+  double soil_depth = mpm::misc::soil_depth_;
+  soil_depth = 1.0;
   double rigid_displacement;
 
   //! TIME STEP BEGINS
@@ -99,7 +100,6 @@ int main (int argc, char* argv[]) {
 		<< sub_time << " ms "
 		<< "total time: " << total_time << " ms \n";
       file_handle.write_data(write_steps, particles, mesh);
-      write_steps++;
       sub_time = 0.;
       //step++;
     }  
@@ -146,13 +146,13 @@ int main (int argc, char* argv[]) {
     particles->iterate_over_tp_particles(std::bind(&mpm::Particle::compute_solid_stress, std::placeholders::_1,dt));
 
     //! ASSIGN FORCES TO NODES
-    //particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_body_force_to_nodes, std::placeholders::_1, Contact));
-    particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_traction_force_to_nodes, std::placeholders::_1,Contact, accumulate_time));
+    particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_body_force_to_nodes, std::placeholders::_1, Contact));
+    //particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_traction_force_to_nodes, std::placeholders::_1,Contact, accumulate_time));
     particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_internal_force_to_nodes, std::placeholders::_1, Contact));
     
-    particles->iterate_over_sp_particles(std::bind(&mpm::Particle::assign_sp_body_force_to_nodes, std::placeholders::_1, Contact));
+    //particles->iterate_over_sp_particles(std::bind(&mpm::Particle::assign_sp_body_force_to_nodes, std::placeholders::_1, Contact));
     particles->iterate_over_sp_particles(std::bind(&mpm::Particle::assign_sp_traction_force_to_nodes, std::placeholders::_1, Contact, accumulate_time));
-    particles->iterate_over_sp_particles(std::bind(&mpm::Particle::assign_sp_internal_force_to_nodes, std::placeholders::_1, Contact));
+    //particles->iterate_over_sp_particles(std::bind(&mpm::Particle::assign_sp_internal_force_to_nodes, std::placeholders::_1, Contact));
 
     // COMPUTE MULTIMATERIAL UNIT NORMAL VECTOR
     particles->iterate_over_particles(std::bind(&mpm::Particle::map_multimaterial_domain_gradients, std::placeholders::_1));
@@ -160,7 +160,7 @@ int main (int argc, char* argv[]) {
     //particles->iterate_over_sp_particles(std::bind(&mpm::Particle::compute_penalty_factor, std::placeholders::_1));
     // mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_nodal_damping_forces, std::placeholders::_1,damping_factor));
 
-    
+    mesh->compute_rigid_body_initial_velocity();
     mesh->compute_rigid_body_int_acceleration(accumulate_time);
     
     // COMPUTE INTERMEDIATE RIGID BODY ACCELERATION
@@ -169,11 +169,8 @@ int main (int argc, char* argv[]) {
     solver->assemble_solver(mesh);
     
     // COMPUTE INTERMEDIATE SOLID AND WATER VELOCITIES
-    // i=0 for CoM and rigid body, i=1 for the first material (mat_id = 0).
-    for (unsigned i=0; i<2; i++) {
-      mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_intermediate_solid_acceleration, std::placeholders::_1, i, dt));
-      mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_intermediate_water_velocity, std::placeholders::_1, i));
-    }
+    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_intermediate_solid_acceleration, std::placeholders::_1, dt));
+    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_intermediate_water_velocity, std::placeholders::_1));
 
     //! SOLVE PROJECTION METHOD: Compute acceleration, velocity, and pore pressure.
     solver->solve_pressure_poisson_equation(dt);
@@ -182,11 +179,11 @@ int main (int argc, char* argv[]) {
 
     // COMPUTE FINAL ACCELERATIONS AND VELOCITIES
     mesh->compute_rigid_body_final_acceleration(accumulate_time);
-    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_final_solid_acceleration, std::placeholders::_1, 1, dt));
+    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_final_solid_acceleration, std::placeholders::_1, dt));
 
     // APPLY CONTACT MECHANICS
     mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::compute_multimaterial_relative_velocities, std::placeholders::_1));
-    mesh -> iterate_over_nodes_of_p(std::bind(&mpm::Node::apply_contact_mechanics, std::placeholders::_1, dt));
+    mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::apply_contact_mechanics, std::placeholders::_1, dt));
     //mesh->iterate_over_nodes_of_p(std::bind(&mpm::Node::matrix_test, std::placeholders::_1));
 
     //! UPDATE PARTICLES
@@ -215,6 +212,12 @@ int main (int argc, char* argv[]) {
     soil_depth = soil_depth + rigid_displacement;
     //std::cout << "rigid displacement: \n" << rigid_displacement << "\n";
     //std::cout << "soil_depth: \n" << soil_depth << "\n";
+
+    //! WRITE OUTPUTS
+    if (((load_step * time_factor * write_steps)- (accumulate_time * time_factor)) < dt * 0.000001) {
+      file_handle.write_para_data(write_steps, mesh);
+      write_steps++;
+    }
 
     auto step_time = std::chrono::high_resolution_clock::now() - begin;
     auto duration = std::chrono::duration <double, std::milli> (step_time).count();

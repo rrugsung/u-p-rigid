@@ -79,6 +79,8 @@ public:
   //! param[in] pressure prescribed pressure value
   void prescribe_pressure_at_free_surface(const double &pressure);
 
+  void compute_rigid_body_initial_velocity();
+
   void compute_rigid_body_int_acceleration(const double &time);
 
   void compute_rigid_body_final_acceleration(const double &time);
@@ -126,13 +128,16 @@ public:
   // WRITE MESH DATA
   void write_mesh_data_to_file(std::ostream& outFile);
 
+  // WRITE PARA DATA
+  void write_para_data_to_file(std::ostream& outFile);
+
 private:
   // free all dynamically allocated memory within "MeshBase" class
   void free_memory();
 
   void check_particle_is_inside_mesh(Eigen::Matrix<int, 1 , dim> &eGrid, unsigned &pId);
 
-    void set_elements_and_nodes_of_particles(unsigned &element_id, std::shared_ptr<mpm::Particle> &particle_ptr);
+  void set_elements_and_nodes_of_particles(unsigned &element_id, std::shared_ptr<mpm::Particle> &particle_ptr);
 
 protected:
   // Pointers to all elements in the mesh

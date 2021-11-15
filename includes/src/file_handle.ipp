@@ -82,7 +82,7 @@ mpm::MpmParticle* mpm::FileHandle::read_particles() {
 
 void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles, mpm::Mesh* &mesh) {
  
-    std::string velocityFile = ResultsDir + "/velocity" + std::to_string(step) + ".vtk";
+    std::string velocityFile = ResultsDir + "/velocity"  + std::to_string(step) + ".vtk";
     std::string pressureFile = ResultsDir + "/pressure" + std::to_string(step) + ".vtk";
     std::string stressFile   = ResultsDir + "/stress" + std::to_string(step) + ".vtk";
     std::string strainFile   = ResultsDir + "/strain" + std::to_string(step) + ".vtk";
@@ -119,6 +119,14 @@ void mpm::FileHandle::write_data(unsigned& step, mpm::MpmParticle* &particles, m
     plasticstrainOut.close();
     deviatoricstrainOut.close();
     meshOut.close();
+}
+
+void mpm::FileHandle::write_para_data(unsigned& step, mpm::Mesh* &mesh) {
+ 
+    std::string paraFile = ResultsDir + "/para" + std::to_string(step) + ".vtk";
+    std::ofstream paraOut(paraFile.c_str());
+    mesh->write_para_data_to_file(paraOut);
+    paraOut.close();
 }
 
 /*
