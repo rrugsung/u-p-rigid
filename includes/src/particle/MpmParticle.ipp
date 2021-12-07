@@ -291,6 +291,25 @@ void mpm::MpmParticle::write_particle_displacement_data_to_file(std::ostream& ou
         i -> write_displacement(outFile);
 }
 
+void mpm::MpmParticle::write_particle_oed_data_to_file(std::ostream& outFile) {
+    unsigned pid;
+    Eigen::Matrix<double,1,dim> pCord;
+    for (auto i : particles_) {
+        pCord = i->give_coordinates();
+        pid = i->give_id();
+        if(pid % 39 == 20) {
+            outFile << pCord(1) << "\n";
+        }
+    }
+    for (auto i : particles_) {
+        pCord = i->give_coordinates();
+        pid = i->give_id();
+        if(pid % 39 == 20) {
+            i -> write_pressure(outFile);
+        }
+    }
+}
+
 void mpm::MpmParticle::write_particle_deviatoric_strain_data_to_file(std::ofstream& outFile) {
       unsigned numOfParticles = particles_.size();
 

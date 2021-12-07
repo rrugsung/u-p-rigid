@@ -216,7 +216,7 @@ void mpm::Particle::map_pore_pressure_from_nodes() {
 }
 
 
-void mpm::Particle::assign_body_force_to_nodes(bool contact) {
+void mpm::Particle::assign_body_force_to_nodes(bool contact, const double &time) {
   for (unsigned i = 0; i < numNodes; i++) {
     Eigen::Matrix<double,1,dim> node_mixture_body_force = shape_fun_(i) * (solid_mass_ + water_mass_) * gravity_ ;
     Eigen::Matrix<double,1,dim> node_water_body_force = shape_fun_(i) * water_mass_ * gravity_ * permeability_ / (porosity_ * 9.81);
@@ -270,9 +270,17 @@ void mpm::Particle::assign_sp_traction_force_to_nodes(bool contact, const double
       unsigned direction = std::get<0>(solid_traction_.at(j));
       double total_traction =std::get<1>(solid_traction_.at(j));
       if (time <= 1){
-         double x = time;
-         total_traction = total_traction*(pow(x,3)*(10 - 15*x + 6*pow(x,2)));
+        double x = time;
+        total_traction = total_traction*(pow(x,3)*(10 - 15*x +6*pow(x,2)));
       }
+      
+      //if (time <= 1){
+      //   total_traction = 0;
+      //}
+      //else if (1 < time && time <= 2){
+      //   double x = time-1;
+      //   total_traction = total_traction*(pow(x,3)*(10 - 15*x + 6*pow(x,2)));
+      //}
       ntotal_traction(direction) += shape_fun_(i) * total_traction * volume_ / spacing_(direction);
     } 
     nodes_(i)->assign_traction_force(ntotal_traction, nwater_traction);

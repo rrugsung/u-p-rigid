@@ -222,6 +222,7 @@ void mpm::Node::write_para_data(std::ostream& oFile) {
     oFile << "intermediate_masses_: \n" << nintrmd_masses_ << " \n";
     oFile << "water_masses_: \n" << nwater_masses_ << " \n";
     oFile << "mixture_masses_: \n" << nmixture_masses_ << " \n";
+    oFile << "mixture_body_forces_: \n" << nmixture_body_forces_ << " \n";
     oFile << "nmixture_trac_forces_: \n" << nmixture_trac_forces_ << " \n";
     oFile << "nmixture_int_forces_: \n" << nmixture_int_forces_ << " \n";
     oFile << "nwater_trac_forces_: \n" << nwater_trac_forces_ << " \n";
@@ -453,6 +454,7 @@ void mpm::Node::compute_multimaterial_normal_unit_vectors() {
       normal_unit_vector = largest_domain_gradient.normalized();
     if (mat_id_largest != i)
       normal_unit_vector = -1 * normal_unit_vector;
+    //if (nid_ == 792 || nid_ == 796) {
     if (nid_ == 110 || nid_ == 120) {
     //if (nid_ == 41 || nid_ == 46) {
       if (i == 0) {

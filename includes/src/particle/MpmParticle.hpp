@@ -103,6 +103,9 @@ public:
   // WRITE PARTICLE DISPLACEMENT DATA
   void write_particle_displacement_data_to_file(std::ostream& outFile);
 
+  // WRITE PARTILE OED DATA
+  void write_particle_oed_data_to_file(std::ostream& outFile);
+
   // temporary function
   void write_particle_deviatoric_strain_data_to_file(std::ofstream &outFile);
   void write_particle_plastic_strain_data_to_file(std::ofstream &outFile);

@@ -146,7 +146,7 @@ int main (int argc, char* argv[]) {
     particles->iterate_over_tp_particles(std::bind(&mpm::Particle::compute_solid_stress, std::placeholders::_1,dt));
 
     //! ASSIGN FORCES TO NODES
-    particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_body_force_to_nodes, std::placeholders::_1, Contact));
+    particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_body_force_to_nodes, std::placeholders::_1, Contact, accumulate_time));
     //particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_traction_force_to_nodes, std::placeholders::_1,Contact, accumulate_time));
     particles->iterate_over_tp_particles(std::bind(&mpm::Particle::assign_internal_force_to_nodes, std::placeholders::_1, Contact));
     

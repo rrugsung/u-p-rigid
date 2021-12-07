@@ -56,7 +56,8 @@ void mpm::Mesh::write_mesh_data_to_file(std::ostream& outFile) {
 void mpm::Mesh::write_para_data_to_file(std::ostream& outFile) {
     for (auto i : nodes_){
         unsigned nid = i -> give_id();
-        if (nid == 43) {
+        if (nid == 115) {
+        //if (nid == 43) {
             i->write_para_data(outFile);
         }
     }
@@ -364,7 +365,10 @@ void mpm::Mesh::compute_rigid_body_initial_velocity() {
         std::set<unsigned> material_ids = n_ptr->material_ids_;
         if (material_ids.size() == 2) {
             unit_normal_vector = n_ptr -> give_node_multimaterial_normal_vectors(0);
-            if (unit_normal_vector(1) - 1 < 1E-15) {
+            unsigned nid = n_ptr -> give_id();
+            //if (nid == 792 || nid == 793 || nid == 794 || nid == 795) {
+            if (std::fabs(unit_normal_vector(1) - 1) < 1E-15) {
+                //initial_velocity += n_ptr -> give_node_solid_multimaterial_initial_velocity(0);
                 initial_velocity += n_ptr -> give_node_solid_initial_velocity();
                 nnode = nnode + 1;
             }
@@ -402,7 +406,8 @@ void mpm::Mesh::compute_rigid_body_int_acceleration(const double &time) {
             mixture_int_force = mixture_int_force + int_normal_force;
         }
         if (material_ids.size() == 2) {
-            rigid_mass += n_ptr-> give_node_mixture_mass();
+            rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(0);
+            //rigid_mass += n_ptr-> give_node_mixture_mass();
         }
     }
 
@@ -451,7 +456,8 @@ void mpm::Mesh::compute_rigid_body_final_acceleration(const double &time) {
             
         }
         if (material_ids.size() == 2) {
-            rigid_mass += n_ptr-> give_node_mixture_mass();
+            rigid_mass += n_ptr-> give_node_multimaterial_mixture_masses(0);
+            //rigid_mass += n_ptr-> give_node_mixture_mass();
         }
     }
     // compute rigid body acceleration

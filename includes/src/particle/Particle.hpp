@@ -126,7 +126,7 @@ public:
 //#####################################
 
   // assign two-phase body force to nodes
-  void assign_body_force_to_nodes(bool contact);
+  void assign_body_force_to_nodes(bool contact, const double &time);
 
   // assign single-phase body force to nodes
   void assign_sp_body_force_to_nodes(bool contact);
